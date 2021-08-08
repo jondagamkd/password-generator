@@ -1,69 +1,49 @@
 // Assignment code here
-//function generateRandomLetter() {
-//  const alphabet = "abcdefghijklmnopqrstuvwxyz"
-//
-//  return alphabet[Math.floor(Math.random() * alphabet.length)]
-//}
-
-//var str = "tacos"
-//var shuffled = str.split('').sort(function(){return 0.5-Math.random()}).join('');
-
-/*
-function shuffle(s) {
-  var arr = s.split('');           // Convert String to array
-  
-  arr.sort(function() {
-    return 0.5 - Math.random();
-  });  
-  
-  s = arr.join('');                // Convert Array to string
-  return s;                        // Return shuffled string
-}
-
-var s = 'ABCDEF';
-s = shuffle(s);
-console.log(s);
-
-//fisher yates method https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
-const points = [40, 100, 1, 5, 25, 10];
-
-for (let i = points.length -1; i > 0; i--) {
-  let j = Math.floor(Math.random() * i)
-  let k = points[i]
-  points[i] = points[j]
-  points[j] = k
-} 
-*/
-//" !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
-
 var generatePassword = function() {
 
+  //Generate all available characters based on user input.  If user does not enter at least one option, repeat.
   while (!passString) {
+    //Declare needed variables
     var passString = "";
     var userInput = false;
     var userValidateStr = "";
     var passLength = false;
     var pass = ""
+    var options = {'lower':"", 'upper':"", 'number':"", "special":""}
+
+    //Ask user if they want lowercase
     var userInput = confirm("Would you like the password to include lowercase letters?");
     if (userInput) {
       passString += "abcdefghijklmnopqrstuvwxyz";
       userValidateStr += "lowercase letters, ";
+      options.lower = "abcdefghijklmnopqrstuvwxyz";
     }
+
+    //Ask user if they want uppercase
     var userInput = confirm("Would you like the password to include uppercase letters?");
     if (userInput) {
       passString += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
       userValidateStr += "uppercase letters, ";
+      options.upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     }
+
+    //Ask user if they want numbers
     var userInput = confirm("Would you like the password to include numbers?");
     if (userInput) {
       passString += "0123456789";
       userValidateStr += "numbers, ";
+      options.number = "0123456789";
     }
+
+    //Ask user if they want special characters
     var userInput = confirm("Would you like the password to include special characters?");
     if (userInput) {
       passString += " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
       userValidateStr += "special characters, ";
+      options.special = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
     }
+
+    //Ask user how long the password should be.  If cancel or other non-numeric answer is given, repeat.
     while (!passLength) {
       var passLength = false;
       var userInput = prompt("How long would you like your password to be?\nPlease enter a number between 8 and 128.");
@@ -76,6 +56,8 @@ var generatePassword = function() {
         alert("Please enter a valid number from 8 to 128.");
       }
     }
+
+    //Verify what options the user has asked for.  If they are not correct, return to beginning.
     if (passString) {
       var userInput = confirm("You have included the following options, would you like to proceed with these?\n" + userValidateStr);
       if (!userInput) {
@@ -87,11 +69,74 @@ var generatePassword = function() {
     }
   }
 
-  for (let index = 0; index < passLength; index++) {
-    pass += passString[Math.floor(Math.random() * passString.length)]
+  //Generate password from available options and make sure all options are included.
+  var needsOption = false;
+  while (!needsOption) {
+    var pass = ""
+    //Start generating password one character at a time depending on available characters.
+    for (let index = 0; index < passLength; index++) {
+      pass += passString[Math.floor(Math.random() * passString.length)];
+    }
+
+    //Check each option to make sure they are included in the final password.  If not, re-roll.
+    //Check lowercase
+    if (options.lower) {
+      if (pass.split('').filter(x => options.lower.split('').includes(x)).length) {
+        var lowerCheck = 1;
+        console.log("has lowercase");
+      }
+      else {
+        var lowerCheck = 0;
+        console.log("Did not include lowercase.");
+      } 
+    }
+    else {var lowerCheck = 1;}
+
+    //Check uppercase
+    if (options.upper) {
+      if (pass.split('').filter(x => options.upper.split('').includes(x)).length) {
+        var upperCheck = 1;
+        console.log("has uppercase");
+      }
+      else {
+        var upperCheck = 0;
+        console.log("Did not include uppercase.");
+      }   
+    }
+    else {var upperCheck = 1;}
+
+    //Check number
+    if (options.number) {
+      if (pass.split('').filter(x => options.number.split('').includes(x)).length) {
+        var numberCheck = 1;
+        console.log("has number");
+      }
+      else {
+        var numberCheck = 0;
+        console.log("Did not include numbers.");
+      }   
+    }
+    else {var numberCheck = 1;}
+
+    //Check special characters
+    if (options.special) {
+      if (pass.split('').filter(x => options.special.split('').includes(x)).length) {
+        var specialCheck = 1;
+        console.log("has special");
+      }
+      else {
+        var specialCheck = 0;
+        console.log("Did not include special characters.");
+      }   
+    }
+    else {var specialCheck = 1;}
+
+    if (lowerCheck && upperCheck && numberCheck && specialCheck) {
+      needsOption = true;
+    }
   }
 
-  //Give the password a good shuffle.
+  //Give the password a good shuffle for extra security.
   function shuffle(input) {
     // Convert string to array.
     var pstring = input.split('');        
@@ -99,10 +144,10 @@ var generatePassword = function() {
     //Using the fisher yates method.
     //https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
     for (let i = pstring.length -1; i > 0; i--) {
-      let j = Math.floor(Math.random() * i)
-      let k = pstring[i]
-      pstring[i] = pstring[j]
-      pstring[j] = k
+      let j = Math.floor(Math.random() * i);
+      let k = pstring[i];
+      pstring[i] = pstring[j];
+      pstring[j] = k;
     }   
 
     // Convert array to string.
